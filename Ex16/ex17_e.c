@@ -17,7 +17,7 @@ struct Address {
 struct Database{
   int max_data;
   int max_rows;
-  struct Address *rows;
+  struct Address **rows;
 };
 
 struct Connection {
