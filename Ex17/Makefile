@@ -1,4 +1,4 @@
 CFLAGS=-Wall -g
 
 clean:
-	rm -rf ex17 *.dSYM
+	rm -rf a.out ex17 db.dat *.dSYM
