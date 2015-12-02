@@ -97,17 +97,23 @@ Database_write(struct Connection *conn)
 }
 
 void
-Database_create(struct Connection *conn)
+Database_create(struct Connection *conn, int max_rows, int max_data)
 {
   int i = 0;
+
+  conn->db->max_rows = max_rows;
+  conn->db->max_data = max_data;
+  conn->db->rows = malloc(max_rows * sizeof(struct Address*));
 
   for(i=0;i<conn->db->max_rows;i++) {
     // make a prototype to initialize it
     // need to dinamically allocate this structure, otherwise
     // it will die after the function returns.
-    struct Address addr = {.id = i, .set = 0};
+    struct Address *addr = malloc(sizeof(struct Address));
+    addr->id =i;
+    addr->set=0;
     // the just assign it
-    conn->db->rows[i] = &addr;
+    conn->db->rows[i] = addr;
   }
 }
 
@@ -179,7 +185,7 @@ int main(int argc, char *argv[])
 
     switch(action) {
         case 'c':
-            Database_create(conn);
+            Database_create(conn,max_rows,max_data);
             Database_write(conn);
             break;
 
