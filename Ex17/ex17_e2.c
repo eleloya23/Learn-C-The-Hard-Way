@@ -182,8 +182,9 @@ Database_get(struct Connection *conn, int id)
 void 
 Database_delete(struct Connection *conn, int id)
 {
-  struct Address addr = {.id = id, .set = 0};
-  conn->db->rows[id] = &addr;
+  // We don't really delete the entry, because that's expensive, we just write the "set" flag as 0
+  struct Address *addr = conn->db->rows[id];
+  addr->set=0;
 }
 
 void
