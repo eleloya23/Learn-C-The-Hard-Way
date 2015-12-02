@@ -25,7 +25,7 @@ After doing the first two steps, the drill is to basically modify every `Databas
 
 **Fifth Step**. The last step consists in reading and closing the database. To read the database, you'll need to mix code from the write and create function [[7]](https://github.com/eleloya/Learn-C-The-Hard-Way/commit/d1b6454935da2ab3b50e3bf9f1dd7cee148abd53). There's a lot of dynamic memory being used, so it's important to make sure to free those resources at the end [[8]](https://github.com/eleloya/Learn-C-The-Hard-Way/commit/9d7ee17a84d3c85a89abd3ed2598bc31516d0f48).
 
-### Add some more fields to the Address and make them searchable.
+### Add more operations you can do on the database, like find.
 [[Solution Code]](ex17_e3.c)
 
 Here is my crude but easy solution:
@@ -60,4 +60,15 @@ switch(action) {
         break;
     //...
 }
+```
+
+Find in action:
+```sh
+$ ./ex17 db.dat c
+$ ./ex17 db.dat s 1 zed zed@zedshaw.com
+$ ./ex17 db.dat s 2 zad zad@zadshaw.com
+$ ./ex17 db.dat f zed
+1 zed zed@zedshaw.com
+$ ./ex17 db.dat f zed@zedshaw.com
+1 zed zed@zedshaw.com
 ```
