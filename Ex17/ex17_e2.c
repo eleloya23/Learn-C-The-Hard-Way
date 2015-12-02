@@ -104,16 +104,16 @@ Database_write(struct Connection *conn)
   for(int i=0; i<conn->db->max_rows; i++){
     struct Address *address = conn->db->rows[i];
 
-    rc = fwrite(&address->id, sizeof(address->id), 1, conn-file);
+    rc = fwrite(&address->id, sizeof(address->id), 1, conn->file);
     if(rc!=1) die("Failed to write address->id");
 
-    rc = fwrite(&address->set, sizeof(address->set), 1, conn-file);
+    rc = fwrite(&address->set, sizeof(address->set), 1, conn->file);
     if(rc!=1) die("Failed to write address->set");
 
-    rc = fwrite(&address->name, sizeof(char), conn->db->max_data, conn-file);
+    rc = fwrite(&address->name, sizeof(char), conn->db->max_data, conn->file);
     if(rc!=1) die("Failed to write address->name");
 
-    rc = fwrite(&address->email, sizeof(char), conn->db->max_data, conn-file);
+    rc = fwrite(&address->email, sizeof(char), conn->db->max_data, conn->file);
     if(rc!=1) die("Failed to write address->email");
   }
 
@@ -137,6 +137,14 @@ Database_create(struct Connection *conn, int max_rows, int max_data)
     struct Address *addr = malloc(sizeof(struct Address));
     addr->id =i;
     addr->set=0;
+    addr->name = malloc(max_data * sizeof(char));
+    addr->email= malloc(max_data * sizeof(char));
+
+    memset(addr->name, 0, max_data * sizeof(char) );
+    memset(addr->name, ' ', max_data * sizeof(char) -1 );
+
+    memset(addr->email, 0, max_data * sizeof(char) );
+    memset(addr->email, ' ', max_data * sizeof(char) -1 );
     // the just assign it
     conn->db->rows[i] = addr;
   }
