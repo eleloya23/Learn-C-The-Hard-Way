@@ -193,7 +193,7 @@ Database_list(struct Connection *conn)
   int i = 0;
   struct Database *db = conn->db;
 
-  for(i=0;i<MAX_ROWS;i++){
+  for(i=0;i<db->max_rows;i++){
     struct Address *cur = db->rows[i];
 
     if(cur->set){
