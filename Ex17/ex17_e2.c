@@ -47,8 +47,34 @@ Address_print(struct Address *addr)
 void 
 Database_load(struct Connection *conn)
 {
-  int rc = fread(conn->db, sizeof(struct Database), 1, conn->file);
-  if(rc != 1) die("Failed to load database.");
+  int rc = fread(&conn->db->max_rows, sizeof(int), 1, conn->file);
+  if(rc != 1) die("Failed to load MAX_ROWS.");
+
+  rc = fread(&conn->db->max_data, sizeof(int), 1, conn->file);
+  if(rc != 1) die("Failed to load MAX_DATA.");
+
+  conn->db->rows = malloc(conn->db->max_rows * sizeof(struct Address*));
+
+  for(int i=0;i<conn->db->max_rows;i++) {
+    struct Address *addr = malloc(sizeof(struct Address));
+    rc = fread(&(addr->id), sizeof(int),1,conn->file);
+    if(rc != 1) die("Failed to load address->id");
+
+    rc = fread(&(addr->set), sizeof(int),1,conn->file);
+    if(rc != 1) die("Failed to load address->set");
+    
+    addr->name = malloc(conn->db->max_data * sizeof(char));
+    addr->email= malloc(conn->db->max_data * sizeof(char));
+
+    rc = fread(addr->name,sizeof(char),conn->db->max_data,conn->file);
+    if(rc != conn->db->max_data) die("Failed to load address->name");
+
+    rc = fread(addr->email,sizeof(char),conn->db->max_data,conn->file);
+    if(rc != conn->db->max_data) die("Failed to load address->email");
+
+    conn->db->rows[i] = addr;
+  }
+
 }
 
 struct Connection *
