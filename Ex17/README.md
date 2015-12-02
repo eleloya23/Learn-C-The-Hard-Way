@@ -25,3 +25,39 @@ After doing the first two steps, the drill is to basically modify every `Databas
 
 **Fifth Step**. The last step consists in reading and closing the database. To read the database, you'll need to mix code from the write and create function [[7]](https://github.com/eleloya/Learn-C-The-Hard-Way/commit/d1b6454935da2ab3b50e3bf9f1dd7cee148abd53). There's a lot of dynamic memory being used, so it's important to make sure to free those resources at the end [[8]](https://github.com/eleloya/Learn-C-The-Hard-Way/commit/9d7ee17a84d3c85a89abd3ed2598bc31516d0f48).
 
+### Add some more fields to the Address and make them searchable.
+[[Solution Code]](ex17_e3.c)
+
+Here is my crude but easy solution:
+```c
+void
+Database_find(struct Connection *conn, const char *query)
+{
+  //Super slow implementation :p
+  int not_found = 1;
+  for(int i=0;i<MAX_ROWS;i++){
+    struct Address *addr = &conn->db->rows[i];
+
+    if( 
+        ((strcmp(query,addr->name)==0) || (strcmp(query,addr->email)==0)) && 
+            addr->set ){
+      Address_print(addr);
+      not_found = 0;
+    }
+
+  }
+  if(not_found) die("Unable to found a record with that name/email");
+}
+```
+Dont forget to add the new action in `main`
+```c
+switch(action) {
+    //...
+    case 'f':
+        if(argc != 4) die("Need a name/email to find");
+
+        Database_find(conn,argv[3]);
+        break;
+    //...
+}
+```
