@@ -140,8 +140,10 @@ Database_create(struct Connection *conn, int max_rows, int max_data)
     addr->name = malloc(max_data * sizeof(char));
     addr->email= malloc(max_data * sizeof(char));
 
-    memset(addr->name, '-', max_data * sizeof(char));
-    memset(addr->email, '_', max_data * sizeof(char));
+    memset(addr->name, 0, max_data * sizeof(char) );
+    memset(addr->email, 0, max_data * sizeof(char) );
+    memset(addr->name, '-', max_data * sizeof(char) -1);
+    memset(addr->email, '_', max_data * sizeof(char) -1);
     // the just assign it
     conn->db->rows[i] = addr;
   }
@@ -157,11 +159,11 @@ Database_set(struct Connection *conn, int id, const char *name,
 
   addr->set = 1;
   // WARNING: bug, read the "How to Break It" and fix this
-  char *res = strncpy(addr->name, name, MAX_DATA);
+  char *res = strncpy(addr->name, name, conn->db->max_data);
   // demostrate the strncpy bug
   if(!res) die("Name copy failed");
 
-  res = strncpy(addr->email, email, MAX_DATA);
+  res = strncpy(addr->email, email, conn->db->max_data);
   if(!res) die("Email copy failed");
 }
 
