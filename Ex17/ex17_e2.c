@@ -4,10 +4,6 @@
 #include <errno.h>
 #include <string.h>
 
-#define MAX_DATA 512
-#define MAX_ROWS 100
-
-
 struct Address {
   int id;
   int set;
@@ -106,6 +102,15 @@ Database_close(struct Connection *conn)
 {
   if(conn){
     if(conn->file) fclose(conn->file);
+    
+    for(int i=0;i<conn->db->max_rows;i++){
+      if(conn->db->rows[i]){
+        free(conn->db->rows[i]->name);
+        free(conn->db->rows[i]->email);
+        free(conn->db->rows[i]);
+      }
+      }
+
     if(conn->db) free(conn->db);
     free(conn);
   }
