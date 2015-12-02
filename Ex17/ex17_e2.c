@@ -110,11 +110,11 @@ Database_write(struct Connection *conn)
     rc = fwrite(&address->set, sizeof(address->set), 1, conn->file);
     if(rc!=1) die("Failed to write address->set");
 
-    rc = fwrite(&address->name, sizeof(char), conn->db->max_data, conn->file);
-    if(rc!=1) die("Failed to write address->name");
+    rc = fwrite(address->name, sizeof(char), conn->db->max_data,  conn->file);
+    if(rc!=conn->db->max_data) die("Failed to write address->name");
 
-    rc = fwrite(&address->email, sizeof(char), conn->db->max_data, conn->file);
-    if(rc!=1) die("Failed to write address->email");
+    rc = fwrite(address->email, sizeof(char), conn->db->max_data, conn->file);
+    if(rc!=conn->db->max_data) die("Failed to write address->email");
   }
 
   rc = fflush(conn->file);
@@ -140,11 +140,8 @@ Database_create(struct Connection *conn, int max_rows, int max_data)
     addr->name = malloc(max_data * sizeof(char));
     addr->email= malloc(max_data * sizeof(char));
 
-    memset(addr->name, 0, max_data * sizeof(char) );
-    memset(addr->name, ' ', max_data * sizeof(char) -1 );
-
-    memset(addr->email, 0, max_data * sizeof(char) );
-    memset(addr->email, ' ', max_data * sizeof(char) -1 );
+    memset(addr->name, '-', max_data * sizeof(char));
+    memset(addr->email, '_', max_data * sizeof(char));
     // the just assign it
     conn->db->rows[i] = addr;
   }
@@ -214,7 +211,7 @@ int main(int argc, char *argv[])
     int max_data = atoi(argv[3]);
 
     if(argc > 5) id = atoi(argv[5]);
-    if(id >= MAX_ROWS) die("There's not that many records.");
+    if(id >= max_rows) die("There's not that many records.");
 
     switch(action) {
         case 'c':
