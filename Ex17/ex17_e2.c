@@ -7,6 +7,7 @@
 #define MAX_DATA 512
 #define MAX_ROWS 100
 
+
 struct Address {
   int id;
   int set;
@@ -88,9 +89,33 @@ void
 Database_write(struct Connection *conn)
 {
   rewind(conn->file);
+  /*
+   * max_rows,max_data,id,set,NAAAME,EEMAIL,id,set,NAAAME,EEMAIL,....
+   */
+  
+  int rc;
+  //Write the max_rows columns
+  rc = fwrite(&conn->db->max_rows, sizeof(conn->db->max_rows), 1, conn->file);
+  if(rc!=1) die("Failed to write MAX_ROWS.");
 
-  int rc = fwrite(conn->db, sizeof(struct Database), 1, conn->file);
-  if(rc!=1) die("Failed to write database.");
+  rc = fwrite(&conn->db->max_data, sizeof(conn->db->max_data), 1, conn->file);
+  if(rc!=1) die("Failed to write MAX_DATA.");
+
+  for(int i=0; i<conn->db->max_rows; i++){
+    struct Address *address = conn->db->rows[i];
+
+    rc = fwrite(&address->id, sizeof(address->id), 1, conn-file);
+    if(rc!=1) die("Failed to write address->id");
+
+    rc = fwrite(&address->set, sizeof(address->set), 1, conn-file);
+    if(rc!=1) die("Failed to write address->set");
+
+    rc = fwrite(&address->name, sizeof(char), conn->db->max_data, conn-file);
+    if(rc!=1) die("Failed to write address->name");
+
+    rc = fwrite(&address->email, sizeof(char), conn->db->max_data, conn-file);
+    if(rc!=1) die("Failed to write address->email");
+  }
 
   rc = fflush(conn->file);
   if(rc==-1) die("Cannot flush database.");
