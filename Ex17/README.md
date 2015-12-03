@@ -72,3 +72,54 @@ $ ./ex17 db.dat f zed
 $ ./ex17 db.dat f zed@zedshaw.com
 1 zed zed@zedshaw.com
 ```
+
+### Read about how C does it's struct packing, and then try to see why your file is the size it is. See if you can calculate a new size after adding more fields.
+
+You just have to sum the byte size of each member. 
+
+```c
+struct Address {
+  int id;  //4
+  int set; //4
+  char name[MAX_DATA]; //512
+  char email[MAX_DATA]; //512
+};
+
+struct Database{
+  struct Address rows[MAX_ROWS]; //1032 * 100 == 103,200
+};
+```
+
+```sh
+$ ./ex17 db.dat c
+$ ls -la db.dat
+-rw-r--r--  1 ele  staff  103200  3 Dec 02:00 db.dat
+```
+
+When your members byte size is not disible by 4 or 8, C will add some padding bytes. 
+It's better if you see the example below.
+
+```c
+struct Address {
+  int id;  //4
+  char initial; //1
+  int set; //4
+  char name[MAX_DATA]; //512
+  char email[MAX_DATA]; //512
+  // 1033
+  // But we have to add 3 more for padding. 
+  // See reference: http://www.catb.org/esr/structure-packing/
+  // 1036
+  // 
+};
+
+struct Database{
+  struct Address rows[MAX_ROWS]; //1036 * 100 == 103,600
+};
+```
+
+```sh
+$ ./ex17 db.dat c
+$ ls -la db.dat
+-rw-r--r--  1 ele  staff  103600  3 Dec 02:04 db.dat
+```
