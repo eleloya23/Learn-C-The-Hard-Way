@@ -125,3 +125,20 @@ $ ./ex17 db.dat c
 $ ls -la db.dat
 -rw-r--r--  1 ele  staff  103600  3 Dec 02:04 db.dat
 ```
+
+### Add some more fields to the Address and make them searchable.
+[[Solution Code]](ex17_e5.c)
+
+Just add a lastname field to the data structure.
+
+```c
+struct Address {
+ int id;
+ int set;
+ char name[MAX_DATA];
+ char lastname[MAX_DATA];
+ char email[MAX_DATA];
+};
+```
+
+After that you need to incorporate the new field in `main()`[[1]](ex17_e5.c#L210-L215)[[2]](ex17_e5.c#L229) `Address_print()`[[3]](ex17_e5.c#L42), `Database_set()`[[4]](ex17_e5.c#L127-L128), `Database_find()`[[5]](ex17_e5.c#L142). Everything else stays the same.
