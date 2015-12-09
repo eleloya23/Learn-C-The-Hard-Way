@@ -25,3 +25,103 @@ After doing the first two steps, the drill is to basically modify every `Databas
 
 **Fifth Step**. The last step consists in reading and closing the database. To read the database, you'll need to mix code from the write and create function [[7]](https://github.com/eleloya/Learn-C-The-Hard-Way/commit/d1b6454935da2ab3b50e3bf9f1dd7cee148abd53). There's a lot of dynamic memory being used, so it's important to make sure to free those resources at the end [[8]](https://github.com/eleloya/Learn-C-The-Hard-Way/commit/9d7ee17a84d3c85a89abd3ed2598bc31516d0f48).
 
+### Add more operations you can do on the database, like find.
+[[Solution Code]](ex17_e3.c)
+
+Here is my crude but easy solution:
+```c
+void
+Database_find(struct Connection *conn, const char *query)
+{
+  //Super slow implementation :p
+  int not_found = 1;
+  for(int i=0;i<MAX_ROWS;i++){
+    struct Address *addr = &conn->db->rows[i];
+
+    if( 
+        ((strcmp(query,addr->name)==0) || (strcmp(query,addr->email)==0)) && 
+            addr->set ){
+      Address_print(addr);
+      not_found = 0;
+    }
+
+  }
+  if(not_found) die("Unable to found a record with that name/email");
+}
+```
+Dont forget to add the new action in `main`
+```c
+switch(action) {
+    //...
+    case 'f':
+        if(argc != 4) die("Need a name/email to find");
+
+        Database_find(conn,argv[3]);
+        break;
+    //...
+}
+```
+
+Find in action:
+```sh
+$ ./ex17 db.dat c
+$ ./ex17 db.dat s 1 zed zed@zedshaw.com
+$ ./ex17 db.dat s 2 zad zad@zadshaw.com
+$ ./ex17 db.dat f zed
+1 zed zed@zedshaw.com
+$ ./ex17 db.dat f zed@zedshaw.com
+1 zed zed@zedshaw.com
+```
+
+### Read about how C does it's struct packing, and then try to see why your file is the size it is. See if you can calculate a new size after adding more fields.
+
+You just have to sum the byte size of each member. 
+
+```c
+struct Address {
+  int id;  //4
+  int set; //4
+  char name[MAX_DATA]; //512
+  char email[MAX_DATA]; //512
+};
+
+struct Database{
+  struct Address rows[MAX_ROWS]; //1032 * 100 == 103,200
+};
+```
+
+```sh
+$ ./ex17 db.dat c
+$ ls -la db.dat
+-rw-r--r--  1 ele  staff  103200  3 Dec 02:00 db.dat
+```
+
+When your members are not byte-aligned by 4 or 8, C will add some padding bytes. 
+It's better if you see the example below.
+
+```c
+struct Address {
+  int id;  //4
+  char initial; //1
+  int set; //4
+  char name[MAX_DATA]; //512
+  char email[MAX_DATA]; //512
+  // 1033
+  // But C internaly adds 3 more bytes for padding. 
+  // char padding[3];
+  // See reference: http://www.catb.org/esr/structure-packing/
+  // 1036
+  // Now, it is divisible by 4
+  // 
+};
+
+struct Database{
+  struct Address rows[MAX_ROWS]; //1036 * 100 == 103,600
+};
+```
+
+```sh
+$ ./ex17 db.dat c
+$ ls -la db.dat
+-rw-r--r--  1 ele  staff  103600  3 Dec 02:04 db.dat
+```
