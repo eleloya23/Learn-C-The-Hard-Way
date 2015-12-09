@@ -142,3 +142,43 @@ struct Address {
 ```
 
 After that you need to incorporate the new field in `main()`[[1]](ex17_e5.c#L210-L215)[[2]](ex17_e5.c#L229) `Address_print()`[[3]](ex17_e5.c#L42), `Database_set()`[[4]](ex17_e5.c#L127-L128), `Database_find()`[[5]](ex17_e5.c#L142). Everything else stays the same.
+
+### Write a shell script that will do your testing automatically for you by running commands in the right order. Hint: Use set -e at the top of a bash to make it abort the whole script if any command has an error.
+[[Solution Code]](test.sh)
+
+The Makefile has to look like this
+```Makefile
+CFLAGS=-Wall -g
+
+test:
+	./test.sh
+
+clean:
+	rm -rf a.out ex17 db.dat *.dSYM
+```
+
+The script `test.sh`
+```bash
+#!/bin/bash
+set -e
+
+echo "Create database db.dat"
+./ex17 db.dat c
+
+echo "Set 1 foo foo@bar.com"
+./ex17 db.dat s 1 foo foo@bar.com
+
+echo "Set 2 baz baz@qux.com"
+./ex17 db.dat s 2 baz baz@qux.com
+
+echo "Printing all records"
+./ex17 db.dat l
+
+echo "Deleting record 1"
+./ex17 db.dat d 1
+
+echo "Getting record 2"
+./ex17 db.dat g 2
+```
+
+To run this script just type `make test`
