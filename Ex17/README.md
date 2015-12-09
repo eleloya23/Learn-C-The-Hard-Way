@@ -96,7 +96,7 @@ $ ls -la db.dat
 -rw-r--r--  1 ele  staff  103200  3 Dec 02:00 db.dat
 ```
 
-When your members byte size is not disible by 4 or 8, C will add some padding bytes. 
+When your members are not byte-aligned by 4 or 8, C will add some padding bytes. 
 It's better if you see the example below.
 
 ```c
@@ -107,9 +107,11 @@ struct Address {
   char name[MAX_DATA]; //512
   char email[MAX_DATA]; //512
   // 1033
-  // But we have to add 3 more for padding. 
+  // But C internaly adds 3 more bytes for padding. 
+  // char padding[3];
   // See reference: http://www.catb.org/esr/structure-packing/
   // 1036
+  // Now, it is divisible by 4
   // 
 };
 
