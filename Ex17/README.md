@@ -182,3 +182,83 @@ echo "Getting record 2"
 ```
 
 To run this script just type `make test`
+
+
+### Try reworking the program to use a single global for the database connection. How does this new version of the program compare to the other one?
+[[Solution code]](ex17_e7.c)
+
+Pros:
+* Less code
+* Fewer arguments
+
+Cons:
+* Not reusable functions
+* Global state is risky
+
+
+### Go research "stack data structure" and write one in your favorite language, then try to do it in C.
+[[Solution Code]](ex17_e8.c)
+
+My favorite language is Ruby, so:
+
+```ruby
+class Stack
+  def initialize
+    @elements = []
+  end
+
+  def push(arg)
+    @elements << arg
+  end
+
+  def pop()
+    @elements.pop
+  end
+
+end
+```
+
+For C, to represent the Stack Structure, I ended up using a `Struct` with  `int` and an `int []`. I wanted to use function pointers, but, thats for the next chapter of this book.
+
+```C
+#include <stdio.h>
+
+#define MAX_SIZE 100
+
+struct Stack{
+  int top;
+  int elements[MAX_SIZE];
+};
+
+struct Stack stack;
+
+void
+push(int n)
+{
+  stack.elements[stack.top] = n;
+  stack.top++;
+}
+
+int
+pop()
+{
+ stack.top--;
+ int n = stack.elements[stack.top];
+ return n;
+}
+
+int
+main(int argc, char **argv){
+  stack.top = 0;
+  push(1);
+  push(2);
+  push(5);
+
+  int a = pop();
+  int b = pop();
+
+  printf("a = %d\nb = %d\n", a, b);
+
+  return 0;
+}
+```
